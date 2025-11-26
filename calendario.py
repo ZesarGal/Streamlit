@@ -1,8 +1,9 @@
 import streamlit as st
 import calendar
 from datetime import date
+import pandas as pd
 
-st.title("Calendario 2025 – Fechas importantes (Nov–Dic)")
+st.title("Calendario – Fechas importantes (Nov 2025 – Ene 2026)")
 
 # Inicializar diccionario de eventos en la sesión
 if "events" not in st.session_state:
@@ -19,13 +20,12 @@ with col1:
         "Elige una fecha",
         value=date(2025, 11, 1),
         min_value=date(2025, 11, 1),
-        max_value=date(2025, 12, 31),
+        max_value=date(2026, 1, 31),
     )
 
 with col2:
-    existing_text = st.session_state["events"].get(
-        selected_date.strftime("%Y-%m-%d"), ""
-    )
+    key = selected_date.strftime("%Y-%m-%d")
+    existing_text = st.session_state["events"].get(key, "")
     activity = st.text_input("Actividad para ese día", value=existing_text)
 
 if st.button("Guardar fecha"):
@@ -35,34 +35,50 @@ if st.button("Guardar fecha"):
 
 st.markdown("---")
 
-# --- Función para dibujar calendario sencillo marcando días con evento ---
-def draw_month(year, month):
-    st.markdown(f"### {calendar.month_name[month]} {year}")
-    cal = calendar.Calendar(firstweekday=0)  # lunes = 0 (si quieres)
-    
-    st.text("Lu Ma Mi Ju Vi Sa Do")
-    for week in cal.monthdayscalendar(year, month):
-        line = ""
+# --- Función para construir un DataFrame tipo calendario ---
+def build_month_df(year: int, month: int) -> pd.DataFrame:
+    cal = calendar.Calendar(firstweekday=0)  # 0 = lunes
+    weeks = cal.monthdayscalendar(year, month)
+
+    data = []
+    for week in weeks:
+        row = []
         for day in week:
             if day == 0:
-                line += "   "
+                row.append("")
             else:
                 key = f"{year}-{month:02d}-{day:02d}"
                 if key in st.session_state["events"]:
-                    # Día con evento → en negritas
-                    line += f"{day:2d}* "
+                    # Día con evento → marcar con un punto
+                    row.append(f"{day} •")
                 else:
-                    line += f"{day:2d}  "
-        st.text(line)
+                    row.append(str(day))
+        data.append(row)
 
-# --- Mostrar calendarios de noviembre y diciembre con días marcados ---
-col_nov, col_dic = st.columns(2)
+    df = pd.DataFrame(
+        data,
+        columns=["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+    )
+    return df
+
+# --- Mostrar calendarios de noviembre, diciembre y enero ---
+st.subheader("Calendario")
+
+col_nov, col_dic, col_ene = st.columns(3)
 
 with col_nov:
-    draw_month(2025, 11)
+    st.markdown("#### Noviembre 2025")
+    st.table(build_month_df(2025, 11))
 
 with col_dic:
-    draw_month(2025, 12)
+    st.markdown("#### Diciembre 2025")
+    st.table(build_month_df(2025, 12))
+
+with col_ene:
+    st.markdown("#### Enero 2026")
+    st.table(build_month_df(2026, 1))
+
+st.caption("Días con evento están marcados como `número •`.")
 
 st.markdown("---")
 
@@ -74,4 +90,5 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
+
 
