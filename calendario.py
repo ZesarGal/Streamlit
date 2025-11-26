@@ -69,7 +69,6 @@ def show_month(title: str, year: int, month: int):
         day = int(val)
         key = f"{year}-{month:02d}-{day:02d}"
         if key in st.session_state["events"]:
-            # TODO: aquí va TODO el estilo en UNA sola línea
             return "color: red; border: 2px solid red; border-radius: 50%;"
         return ""
 
@@ -125,4 +124,10 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
+
+# --- Botón para eliminar todas las fechas marcadas ---
+if st.session_state["events"]:
+    if st.button("Eliminar todas las fechas marcadas"):
+        st.session_state["events"].clear()
+        st.success("Se eliminaron todas las fechas marcadas.")
 
