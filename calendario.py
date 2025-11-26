@@ -23,15 +23,27 @@ with col1:
         max_value=date(2026, 1, 31),
     )
 
+key = selected_date.strftime("%Y-%m-%d")
+
 with col2:
-    key = selected_date.strftime("%Y-%m-%d")
     existing_text = st.session_state["events"].get(key, "")
     activity = st.text_input("Actividad para ese día", value=existing_text)
 
-if st.button("Guardar fecha"):
-    key = selected_date.strftime("%Y-%m-%d")
-    st.session_state["events"][key] = activity
-    st.success(f"Guardado: {key} → {activity}")
+# Botones: guardar / eliminar la fecha seleccionada
+col_guardar, col_eliminar = st.columns(2)
+
+with col_guardar:
+    if st.button("Guardar fecha"):
+        st.session_state["events"][key] = activity
+        st.success(f"Guardado: {key} → {activity}")
+
+with col_eliminar:
+    if st.button("Eliminar fecha seleccionada"):
+        if key in st.session_state["events"]:
+            st.session_state["events"].pop(key)
+            st.success(f"Se eliminó la fecha {key}.")
+        else:
+            st.info(f"La fecha {key} no tenía actividad guardada.")
 
 st.markdown("---")
 
@@ -67,8 +79,8 @@ def show_month(title: str, year: int, month: int):
         if not val.isdigit():
             return ""
         day = int(val)
-        key = f"{year}-{month:02d}-{day:02d}"
-        if key in st.session_state["events"]:
+        k = f"{year}-{month:02d}-{day:02d}"
+        if k in st.session_state["events"]:
             return "color: red; border: 2px solid red; border-radius: 50%;"
         return ""
 
@@ -120,14 +132,8 @@ st.markdown("---")
 st.subheader("Fechas marcadas")
 
 if st.session_state["events"]:
-    for key, text in sorted(st.session_state["events"].items()):
-        st.write(f"📅 **{key}** → {text}")
+    for k, text in sorted(st.session_state["events"].items()):
+        st.write(f"📅 **{k}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
-
-# --- Botón para eliminar todas las fechas marcadas ---
-if st.session_state["events"]:
-    if st.button("Eliminar todas las fechas marcadas"):
-        st.session_state["events"].clear()
-        st.success("Se eliminaron todas las fechas marcadas.")
 
