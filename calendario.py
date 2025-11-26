@@ -60,7 +60,8 @@ def show_month(title: str, year: int, month: int):
     st.markdown(f"#### {title}")
     df = build_month_df(year, month)
 
-    # Función de estilo para encerrar en círculo rojo las fechas con evento
+    # Estilo: círculo rojo alrededor de las fechas con evento,
+    # sin modificar width/height ni inline-block para evitar que se encimen.
     def style_events(val):
         if val == "":
             return ""
@@ -69,15 +70,10 @@ def show_month(title: str, year: int, month: int):
         day = int(val)
         key = f"{year}-{month:02d}-{day:02d}"
         if key in st.session_state["events"]:
-            # Círculo rojo alrededor del número
             return (
                 "color: red;"
                 "border: 2px solid red;"
                 "border-radius: 50%;"
-                "width: 1.8rem;"
-                "height: 1.8rem;"
-                "display: inline-block;"
-                "line-height: 1.8rem;"
             )
         return ""
 
@@ -88,50 +84,10 @@ def show_month(title: str, year: int, month: int):
                 "selector": "th",
                 "props": [
                     ("text-align", "center"),
-                    ("padding", "0.1rem"),
+                    ("padding", "0.2rem"),
                     ("font-size", "0.8rem"),
                 ],
             },
             {
                 "selector": "td",
-                "props": [
-                    ("text-align", "center"),
-                    ("padding", "0.1rem"),
-                    ("font-size", "0.85rem"),
-                    ("width", "1.8rem"),
-                    ("height", "1.8rem"),
-                ],
-            },
-        ])
-        .hide(axis="index")        # sin índices
-        .applymap(style_events)    # aplica el círculo rojo a las celdas con evento
-    )
 
-    st.table(styler)
-
-# --- Mostrar calendarios de noviembre, diciembre y enero ---
-st.subheader("Calendario")
-
-col_nov, col_dic, col_ene = st.columns(3)
-
-with col_nov:
-    show_month("Noviembre 2025", 2025, 11)
-
-with col_dic:
-    show_month("Diciembre 2025", 2025, 12)
-
-with col_ene:
-    show_month("Enero 2026", 2026, 1)
-
-st.caption("Las fechas con evento se muestran con el número dentro de un círculo rojo.")
-
-st.markdown("---")
-
-# --- Lista de eventos guardados ---
-st.subheader("Fechas marcadas")
-
-if st.session_state["events"]:
-    for key, text in sorted(st.session_state["events"].items()):
-        st.write(f"📅 **{key}** → {text}")
-else:
-    st.write("Aún no has marcado ninguna fecha.")
