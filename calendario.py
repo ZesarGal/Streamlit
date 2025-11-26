@@ -57,7 +57,7 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
 
     df = pd.DataFrame(
         data,
-        columns=["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+        columns=["L", "M", "X", "J", "V", "S", "D"]  # <-- aquí el cambio
     )
     return df
 
@@ -90,5 +90,4 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
-
 
