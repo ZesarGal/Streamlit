@@ -2,13 +2,35 @@ import streamlit as st
 import calendar
 from datetime import date
 import pandas as pd
+import json
+import os
 
 st.title("Calendario – Fechas importantes (Nov 2025 – Ene 2026)")
 
-# Inicializar diccionario de eventos en la sesión
+EVENTS_FILE = "events.json"
+
+# --- Funciones para guardar/cargar en archivo ---
+
+def load_events_from_file():
+    if os.path.exists(EVENTS_FILE):
+        try:
+            with open(EVENTS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            # nos aseguramos que sea diccionario
+            if isinstance(data, dict):
+                return data
+        except Exception:
+            pass
+    return {}
+
+def save_events_to_file():
+    with open(EVENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(st.session_state["events"], f, ensure_ascii=False, indent=2)
+
+# --- Inicializar diccionario de eventos en la sesión ---
 if "events" not in st.session_state:
-    # Clave: "YYYY-MM-DD", Valor: texto de la actividad
-    st.session_state["events"] = {}
+    # Cargamos de archivo si existe
+    st.session_state["events"] = load_events_from_file()
 
 # --- Formulario para agregar/editar eventos ---
 st.subheader("Agregar / editar fecha")
@@ -35,12 +57,14 @@ col_guardar, col_eliminar = st.columns(2)
 with col_guardar:
     if st.button("Guardar fecha"):
         st.session_state["events"][key] = activity
+        save_events_to_file()
         st.success(f"Guardado: {key} → {activity}")
 
 with col_eliminar:
     if st.button("Eliminar fecha seleccionada"):
         if key in st.session_state["events"]:
             st.session_state["events"].pop(key)
+            save_events_to_file()
             st.success(f"Se eliminó la fecha {key}.")
         else:
             st.info(f"La fecha {key} no tenía actividad guardada.")
@@ -136,4 +160,5 @@ if st.session_state["events"]:
         st.write(f"📅 **{k}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
+
 
