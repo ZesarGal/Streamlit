@@ -60,8 +60,7 @@ def show_month(title: str, year: int, month: int):
     st.markdown(f"#### {title}")
     df = build_month_df(year, month)
 
-    # Estilo: círculo rojo alrededor de las fechas con evento,
-    # sin modificar width/height ni inline-block para evitar que se encimen.
+    # Estilo: círculo rojo alrededor de las fechas con evento
     def style_events(val):
         if val == "":
             return ""
@@ -70,11 +69,8 @@ def show_month(title: str, year: int, month: int):
         day = int(val)
         key = f"{year}-{month:02d}-{day:02d}"
         if key in st.session_state["events"]:
-            return (
-                "color: red;"
-                "border: 2px solid red;"
-                "border-radius: 50%;"
-            )
+            # TODO: aquí va TODO el estilo en UNA sola línea
+            return "color: red; border: 2px solid red; border-radius: 50%;"
         return ""
 
     styler = (
@@ -129,6 +125,4 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
-
-                "
 
