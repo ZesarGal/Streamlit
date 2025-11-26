@@ -90,4 +90,45 @@ def show_month(title: str, year: int, month: int):
             },
             {
                 "selector": "td",
+                "props": [
+                    ("text-align", "center"),
+                    ("padding", "0.2rem"),
+                    ("font-size", "0.85rem"),
+                ],
+            },
+        ])
+        .hide(axis="index")        # sin índices
+        .applymap(style_events)    # círculo rojo solo a celdas con evento
+    )
+
+    st.table(styler)
+
+# --- Mostrar calendarios de noviembre, diciembre y enero ---
+st.subheader("Calendario")
+
+col_nov, col_dic, col_ene = st.columns(3)
+
+with col_nov:
+    show_month("Noviembre 2025", 2025, 11)
+
+with col_dic:
+    show_month("Diciembre 2025", 2025, 12)
+
+with col_ene:
+    show_month("Enero 2026", 2026, 1)
+
+st.caption("Las fechas con evento se muestran con un círculo rojo alrededor del número.")
+
+st.markdown("---")
+
+# --- Lista de eventos guardados ---
+st.subheader("Fechas marcadas")
+
+if st.session_state["events"]:
+    for key, text in sorted(st.session_state["events"].items()):
+        st.write(f"📅 **{key}** → {text}")
+else:
+    st.write("Aún no has marcado ninguna fecha.")
+
+                "
 
