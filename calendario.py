@@ -45,7 +45,7 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
         row = []
         for day in week:
             if day == 0:
-                row.append("")
+                row.append("")  # celda vacía
             else:
                 key = f"{year}-{month:02d}-{day:02d}"
                 if key in st.session_state["events"]:
@@ -57,9 +57,19 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
 
     df = pd.DataFrame(
         data,
-        columns=["L", "M", "X", "J", "V", "S", "D"]  # <-- aquí el cambio
+        columns=["L", "M", "X", "J", "V", "S", "D"]
     )
     return df
+
+def show_month(title: str, year: int, month: int):
+    st.markdown(f"#### {title}")
+    df = build_month_df(year, month)
+    styler = (
+        df.style
+        .set_properties(**{"text-align": "center"})
+        .hide(axis="index")  # <-- quita los índices
+    )
+    st.table(styler)
 
 # --- Mostrar calendarios de noviembre, diciembre y enero ---
 st.subheader("Calendario")
@@ -67,16 +77,13 @@ st.subheader("Calendario")
 col_nov, col_dic, col_ene = st.columns(3)
 
 with col_nov:
-    st.markdown("#### Noviembre 2025")
-    st.table(build_month_df(2025, 11))
+    show_month("Noviembre 2025", 2025, 11)
 
 with col_dic:
-    st.markdown("#### Diciembre 2025")
-    st.table(build_month_df(2025, 12))
+    show_month("Diciembre 2025", 2025, 12)
 
 with col_ene:
-    st.markdown("#### Enero 2026")
-    st.table(build_month_df(2026, 1))
+    show_month("Enero 2026", 2026, 1)
 
 st.caption("Días con evento están marcados como `número •`.")
 
