@@ -47,12 +47,7 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
             if day == 0:
                 row.append("")  # celda vacía
             else:
-                key = f"{year}-{month:02d}-{day:02d}"
-                if key in st.session_state["events"]:
-                    # Día con evento → marcar con círculo
-                    row.append(f"{day}○")
-                else:
-                    row.append(str(day))
+                row.append(str(day))
         data.append(row)
 
     df = pd.DataFrame(
@@ -64,6 +59,27 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
 def show_month(title: str, year: int, month: int):
     st.markdown(f"#### {title}")
     df = build_month_df(year, month)
+
+    # Función de estilo para encerrar en círculo rojo las fechas con evento
+    def style_events(val):
+        if val == "":
+            return ""
+        if not val.isdigit():
+            return ""
+        day = int(val)
+        key = f"{year}-{month:02d}-{day:02d}"
+        if key in st.session_state["events"]:
+            # Círculo rojo alrededor del número
+            return (
+                "color: red;"
+                "border: 2px solid red;"
+                "border-radius: 50%;"
+                "width: 1.8rem;"
+                "height: 1.8rem;"
+                "display: inline-block;"
+                "line-height: 1.8rem;"
+            )
+        return ""
 
     styler = (
         df.style
@@ -80,13 +96,15 @@ def show_month(title: str, year: int, month: int):
                 "selector": "td",
                 "props": [
                     ("text-align", "center"),
-                    ("padding", "0.1rem"),   # poco espacio
+                    ("padding", "0.1rem"),
                     ("font-size", "0.85rem"),
-                    ("width", "1.6rem"),     # columnas estrechas
+                    ("width", "1.8rem"),
+                    ("height", "1.8rem"),
                 ],
             },
         ])
-        .hide(axis="index")  # sin índices
+        .hide(axis="index")        # sin índices
+        .applymap(style_events)    # aplica el círculo rojo a las celdas con evento
     )
 
     st.table(styler)
@@ -105,7 +123,7 @@ with col_dic:
 with col_ene:
     show_month("Enero 2026", 2026, 1)
 
-st.caption("Las fechas con evento están marcadas como `número○` (por ejemplo `24○`).")
+st.caption("Las fechas con evento se muestran con el número dentro de un círculo rojo.")
 
 st.markdown("---")
 
@@ -117,4 +135,3 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
-
