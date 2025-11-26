@@ -49,8 +49,8 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
             else:
                 key = f"{year}-{month:02d}-{day:02d}"
                 if key in st.session_state["events"]:
-                    # Día con evento → marcar con un punto
-                    row.append(f"{day}•")
+                    # Día con evento → marcar con círculo
+                    row.append(f"{day}○")
                 else:
                     row.append(str(day))
         data.append(row)
@@ -80,9 +80,9 @@ def show_month(title: str, year: int, month: int):
                 "selector": "td",
                 "props": [
                     ("text-align", "center"),
-                    ("padding", "0.1rem"),   # menos espacio entre números
+                    ("padding", "0.1rem"),   # poco espacio
                     ("font-size", "0.85rem"),
-                    ("width", "1.6rem"),     # columnas más estrechas
+                    ("width", "1.6rem"),     # columnas estrechas
                 ],
             },
         ])
@@ -105,7 +105,7 @@ with col_dic:
 with col_ene:
     show_month("Enero 2026", 2026, 1)
 
-st.caption("Días con evento están marcados como `número•` (por ejemplo `24•`).")
+st.caption("Las fechas con evento están marcadas como `número○` (por ejemplo `24○`).")
 
 st.markdown("---")
 
@@ -117,3 +117,4 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
+
