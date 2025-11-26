@@ -50,7 +50,7 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
                 key = f"{year}-{month:02d}-{day:02d}"
                 if key in st.session_state["events"]:
                     # Día con evento → marcar con un punto
-                    row.append(f"{day} •")
+                    row.append(f"{day}•")
                 else:
                     row.append(str(day))
         data.append(row)
@@ -64,11 +64,31 @@ def build_month_df(year: int, month: int) -> pd.DataFrame:
 def show_month(title: str, year: int, month: int):
     st.markdown(f"#### {title}")
     df = build_month_df(year, month)
+
     styler = (
         df.style
-        .set_properties(**{"text-align": "center"})
-        .hide(axis="index")  # <-- quita los índices
+        .set_table_styles([
+            {
+                "selector": "th",
+                "props": [
+                    ("text-align", "center"),
+                    ("padding", "0.1rem"),
+                    ("font-size", "0.8rem"),
+                ],
+            },
+            {
+                "selector": "td",
+                "props": [
+                    ("text-align", "center"),
+                    ("padding", "0.1rem"),   # menos espacio entre números
+                    ("font-size", "0.85rem"),
+                    ("width", "1.6rem"),     # columnas más estrechas
+                ],
+            },
+        ])
+        .hide(axis="index")  # sin índices
     )
+
     st.table(styler)
 
 # --- Mostrar calendarios de noviembre, diciembre y enero ---
@@ -85,7 +105,7 @@ with col_dic:
 with col_ene:
     show_month("Enero 2026", 2026, 1)
 
-st.caption("Días con evento están marcados como `número •`.")
+st.caption("Días con evento están marcados como `número•` (por ejemplo `24•`).")
 
 st.markdown("---")
 
@@ -97,4 +117,3 @@ if st.session_state["events"]:
         st.write(f"📅 **{key}** → {text}")
 else:
     st.write("Aún no has marcado ninguna fecha.")
-
